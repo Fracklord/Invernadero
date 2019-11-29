@@ -1,7 +1,5 @@
-//LIBRERÍAS SENSOR CAPACITIVO
-#include<SPI.h>
-#include<Ethernet.h>
 //Capacitive Soil Moinsture Sensor v1.2
+#include <SPI.h>
 #include <Wire.h>
 //DS18B20
 #include <OneWire.h>
@@ -20,20 +18,15 @@ int varLDR;
 const int Trigger = 7;
 const int Echo = 8; 
 
-byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFF, 0xEE};
-byte ip[] = {192,168,0,101};
-byte server[] = {192,168,0,100};
-EthernetClient client;
-
-void setup(void) {
-  Ethernet.begin(mac, ip);
+void setup(){
   Serial.begin(9600);
+  sensorDS18B20.begin(); 
   pinMode(Trigger, OUTPUT);
   pinMode(Echo, INPUT);
   digitalWrite(Trigger, LOW);
 }
 
-void loop(void) {
+void loop(){
   varCap = analogRead(pinCap);
   Serial.print("HUMEDAD SUELO: ");
   Serial.println(varCap);
@@ -55,26 +48,7 @@ void loop(void) {
   Serial.print("CANTIDAD AGUA: ");
   Serial.println(d);
 
-
-  if(client.connect(server,80)>0){
-    Serial.println("conexión establecida");
-    client.print("GET /vivero/datos.php?varCap=&sensorDS18B20=&pinLDR=&d=");
-    client.print(varCap);
-    client.print(sensorDS18B20);
-    client.print(pinLDR);
-    client.print(d);
-    client.println(" HTTP/1.0");
-    client.println("User-Agent: Arduino 1.0");
-    client.println();
-    Serial.println("Conectado"); 
-  }
+  Serial.println("----------------------");
   
-  else {
-    Serial.println("Error en la conexion");
-  }
-  
-  client.stop();
-  client.flush();
   delay(1000);
 }
-   
