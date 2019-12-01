@@ -25,15 +25,16 @@ byte ip[] = {192,168,0,101};
 byte server[] = {192,168,0,100};
 EthernetClient client;
 
-void setup(void) {
+void setup(void){
   Ethernet.begin(mac, ip);
   Serial.begin(9600);
   pinMode(Trigger, OUTPUT);
   pinMode(Echo, INPUT);
   digitalWrite(Trigger, LOW);
+  delay(1000);
 }
 
-void loop(void) {
+void loop(void){
   varCap = analogRead(pinCap);
   Serial.print("HUMEDAD SUELO: ");
   Serial.println(varCap);
@@ -55,13 +56,39 @@ void loop(void) {
   Serial.print("CANTIDAD AGUA: ");
   Serial.println(d);
 
+  if(client.connect(server,80)>0){
+    Serial.println("conexión establecida");
+    client.print("GET /Invernadero/datos.php?varCap=");
+    client.print(varCap);
+    client.println(" HTTP/1.0");
+    client.println("User-Agent: Arduino 1.0");
+    client.println();
+    Serial.println("Conectado"); 
+  }
 
   if(client.connect(server,80)>0){
     Serial.println("conexión establecida");
-    client.print("GET /vivero/datos.php?varCap=&sensorDS18B20=&pinLDR=&d=");
-    client.print(varCap);
-    client.print(sensorDS18B20);
-    client.print(pinLDR);
+    client.print("GET /Invernadero/datos.php?sensorDS18B20=");
+    client.print(sensorDS18B20.getTempCByIndex(0));
+    client.println(" HTTP/1.0");
+    client.println("User-Agent: Arduino 1.0");
+    client.println();
+    Serial.println("Conectado"); 
+  }
+
+  if(client.connect(server,80)>0){
+    Serial.println("conexión establecida");
+    client.print("GET /Invernadero/datos.php?varLDR=");
+    client.print(varLDR);
+    client.println(" HTTP/1.0");
+    client.println("User-Agent: Arduino 1.0");
+    client.println();
+    Serial.println("Conectado"); 
+  }
+  
+  if(client.connect(server,80)>0){
+    Serial.println("conexión establecida");
+    client.print("GET /Invernadero/datos.php?d=");
     client.print(d);
     client.println(" HTTP/1.0");
     client.println("User-Agent: Arduino 1.0");
@@ -69,7 +96,7 @@ void loop(void) {
     Serial.println("Conectado"); 
   }
   
-  else {
+  else{
     Serial.println("Error en la conexion");
   }
   
