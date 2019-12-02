@@ -2,11 +2,11 @@
 $usuario = "root";
 $clave = "";
 $servidor = "localhost";
-$basededatos = "vivero";
+$basededatos = "huerto";
 //creacion de la conexio0n de la base de datos con mysql_connect
 $conexion=mysqli_connect($servidor, $usuario, $clave) or die ("no se ha pdido conectar al servidor");
 //selecion de la ase de datos a utilizar
-$db =mysqli_select_db($conexion, $basededatos) or die ("no se ha podido conectar a la base de datos");
+$db = mysqli_select_db($conexion, $basededatos) or die ("no se ha podido conectar a la base de datos");
 //seleccion del a base de datos
 $consulta = "SELECT * FROM sensor_suelo JOIN sensor_luminosidad JOIN sensor_distancia 
 JOIN sensor_dht11 LIMIT 11 ";
@@ -35,10 +35,11 @@ while($columna = mysqli_fetch_array($resultado)){
   $sensor["dht11_temperatura"] = $columna ['dht11_temperatura'];
   $sensor["fecha_medicion"] = $columna ['fecha_medicion'];
   $sensor["hora_medicion"] = $columna ['hora_medicion'];
-  array_push($sensores,$sensor);
+  array_push($sensores, $sensor);
 }
+
 while($columna=mysqli_fetch_array($resultado)){                                          
-          echo "</tr>";
+
 }       
  ?> 
 <!DOCTYPE html>

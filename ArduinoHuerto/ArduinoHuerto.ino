@@ -7,6 +7,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+//SENSORES
 const int pinCap = 0;
 float varCap;
 
@@ -18,7 +19,14 @@ const int pinLDR = 1;
 int varLDR;
 
 const int Trigger = 7;
-const int Echo = 8; 
+const int Echo = 8;
+
+//ACTUADORES
+const int Vent = 3;
+int PWMVent;
+
+const int Bomb = 5;
+int PMWBomb;
 
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFF, 0xEE};
 byte ip[] = {192,168,0,101};
@@ -31,16 +39,33 @@ void setup(void){
   pinMode(Trigger, OUTPUT);
   pinMode(Echo, INPUT);
   digitalWrite(Trigger, LOW);
-  delay(1000);
+  pinMode(Vent, OUTPUT);
+//  delay(1000);
 }
 
 void loop(void){
   varCap = analogRead(pinCap);
   Serial.print("HUMEDAD SUELO: ");
   Serial.println(varCap);
+  if(varCap >= 560){
+    PWMBomb = 255;
+    analogWrite(Bomb, PWMBomb);
+    delay(500);
+    PWMBomb = 0;
+    analogWrite(Bomb, PWMBomb);
+    delay(500);
+  }
 
   Serial.print("TEMPERATURA AMBIENTE: ");
   Serial.println(sensorDS18B20.getTempCByIndex(0));
+  if(sensorDS18B20.getTempCByIndex(0) >= 3){
+    PWMVent = 255;
+    analogWrite(Vent, PWMVent);
+    delay(500);
+    PWMVent = 0;
+    analogWrite(Vent, PWMVent);
+    delay(500);
+  }
 
   varLDR = analogRead(pinLDR);
   Serial.print("VALOR LUMINOSIDAD: ");
