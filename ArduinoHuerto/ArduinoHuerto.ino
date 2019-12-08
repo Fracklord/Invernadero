@@ -28,6 +28,9 @@ int PWMVent;
 const int Bomb = 5;
 int PMWBomb;
 
+float sinVal;
+int toneVal;
+
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFF, 0xEE};
 byte ip[] = {192,168,0,101};
 byte server[] = {192,168,0,100};
@@ -40,6 +43,7 @@ void setup(void){
   pinMode(Echo, INPUT);
   digitalWrite(Trigger, LOW);
   pinMode(Vent, OUTPUT);
+  pinMode(4, OUTPUT);
 //  delay(1000);
 }
 
@@ -48,23 +52,33 @@ void loop(void){
   Serial.print("HUMEDAD SUELO: ");
   Serial.println(varCap);
   if(varCap >= 560){
-    PWMBomb = 255;
-    analogWrite(Bomb, PWMBomb);
-    delay(500);
-    PWMBomb = 0;
-    analogWrite(Bomb, PWMBomb);
-    delay(500);
+    PMWBomb = 255;
+    if(PMWBomb = 255){
+      analogWrite(Vent, PMWBomb);
+    }
+  }
+  else if(varCap <= 560){
+    PMWBomb = 0;
+    if(PMWBomb = 0){
+      analogWrite(Vent, PMWBomb);
+    }
   }
 
+  sensorDS18B20.requestTemperatures();
   Serial.print("TEMPERATURA AMBIENTE: ");
   Serial.println(sensorDS18B20.getTempCByIndex(0));
-  if(sensorDS18B20.getTempCByIndex(0) >= 3){
+
+  if(sensorDS18B20.getTempCByIndex(0) > 28){
     PWMVent = 255;
-    analogWrite(Vent, PWMVent);
-    delay(500);
+    if(PWMVent = 255){
+      analogWrite(Vent, PWMVent);
+    }
+  }
+  else if(sensorDS18B20.getTempCByIndex(0) <= 28){
     PWMVent = 0;
-    analogWrite(Vent, PWMVent);
-    delay(500);
+    if(PWMVent = 0){
+      analogWrite(Vent, PWMVent);
+    }
   }
 
   varLDR = analogRead(pinLDR);
@@ -81,6 +95,21 @@ void loop(void){
   Serial.print("CANTIDAD AGUA: ");
   Serial.println(d);
 
+  if(d >= 18){
+    for(int x=0; x<180; x++){
+      sinVal = (sin(x*(3.1412/180)));
+      toneVal = 2000+(int(sinVal*1000));
+      tone(4, toneVal);
+      delay(2);
+    }
+  }
+  else if(d <= 17){
+    noTone(4);
+    delay(2);
+  }
+
+
+//Funciona todo
   if(client.connect(server,80)>0){
     Serial.println("conexión establecida");
     client.print("GET /Invernadero/datos.php?varCap=");
