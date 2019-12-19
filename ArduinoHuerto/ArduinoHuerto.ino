@@ -1,4 +1,44 @@
-//LIBRERÍAS SENSOR CAPACITIVO
+/*
+|-------------------------|
+|                         |
+|    Huerto Inteligente   |  
+|         Kaju-en         |
+|       -----X-----       |
+|   Proyecto entregado a  |
+|     CFT LOTA ARAUCO     |
+|                         |
+|-------------------------|
+|                         |
+|        IMPORTANTE       |
+|  El producto entregado  |
+|  contempla la utiliza-  |
+|  ción de los componen-  |
+|  tes señalados a con-   |
+|  tinuación:             |
+|                         |
+|-------------------------|
+|     Última edición      |
+|       19/12/2019        |
+|-------------------------|
+ 
+  SENSORES
++ Soil Moinsture Sensor v1.2
++ DS18B20
++ Resistencia fotosensible/LDR
++ HC-SR04
+
+  ACTUADORES
++ Turbina ventilador 12v
++ Motor ventilador 12v
++ Bomba de agua anfibia 5v/6v
++ Speaker tester
+
+--------------------------
+        FRACKLORD      
+--------------------------
+*/
+//LIBRERÍAS
+//Ethernet Shield
 #include<SPI.h>
 #include<Ethernet.h>
 //Capacitive Soil Moinsture Sensor v1.2
@@ -7,7 +47,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-//SENSORES
+//PIN SENSORES
 const int pinCap = 0;
 float varCap;
 
@@ -22,63 +62,55 @@ const int Trigger = 7;
 const int Echo = 8;
 
 //ACTUADORES
-const int Vent = 3;
-int PWMVent;
-
-const int Bomb = 5;
-int PMWBomb;
-
+//Ventilador
+//NO SE UTILIZÓ RELÉ, DE TODAS MANERAS FUNCIONA CON TRANSISTOR (activa el motor a su máxima potencia)
+const int rele1 = 3;
+//Bomba de agua
+//NO SE UTILIZÓ RELÉ, DE TODAS MANERAS FUNCIONA CON TRANSISTOR (activa el motor a su máxima potencia)
+const int rele2 = 5;
+//Variables tonos speaker
 float sinVal;
 int toneVal;
 
+//Conexión server/arduino
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFF, 0xEE};
 byte ip[] = {192,168,0,101};
 byte server[] = {192,168,0,100};
 EthernetClient client;
 
-void setup(void){
+void setup(){
   Ethernet.begin(mac, ip);
   Serial.begin(9600);
   pinMode(Trigger, OUTPUT);
   pinMode(Echo, INPUT);
   digitalWrite(Trigger, LOW);
-  pinMode(Vent, OUTPUT);
   pinMode(4, OUTPUT);
+  pinMode(rele1, OUTPUT);
+  pinMode(rele2, OUTPUT);
 //  delay(1000);
 }
 
-void loop(void){
+void loop(){
   varCap = analogRead(pinCap);
   Serial.print("HUMEDAD SUELO: ");
   Serial.println(varCap);
+  //ACTIVACIÓN DE ACTUADORES MEDIANTE CLASES
   if(varCap >= 560){
-    PMWBomb = 255;
-    if(PMWBomb = 255){
-      analogWrite(Vent, PMWBomb);
-    }
+    activaBomba();
   }
-  else if(varCap <= 560){
-    PMWBomb = 0;
-    if(PMWBomb = 0){
-      analogWrite(Vent, PMWBomb);
-    }
+  else if(varCap <= 559){
+    apagaBomba();
   }
 
   sensorDS18B20.requestTemperatures();
   Serial.print("TEMPERATURA AMBIENTE: ");
   Serial.println(sensorDS18B20.getTempCByIndex(0));
-
-  if(sensorDS18B20.getTempCByIndex(0) > 28){
-    PWMVent = 255;
-    if(PWMVent = 255){
-      analogWrite(Vent, PWMVent);
-    }
+  //ACTIVACIÓN DE ACTUADORES MEDIANTE CLASES
+  if(sensorDS18B20.getTempCByIndex(0) >= 27){
+    activaVentilador();
   }
-  else if(sensorDS18B20.getTempCByIndex(0) <= 28){
-    PWMVent = 0;
-    if(PWMVent = 0){
-      analogWrite(Vent, PWMVent);
-    }
+  else if(sensorDS18B20.getTempCByIndex(0) <= 26){
+    apagaVentilador();
   }
 
   varLDR = analogRead(pinLDR);
@@ -94,22 +126,15 @@ void loop(void){
   d = t/59; 
   Serial.print("CANTIDAD AGUA: ");
   Serial.println(d);
-
-  if(d >= 18){
-    for(int x=0; x<180; x++){
-      sinVal = (sin(x*(3.1412/180)));
-      toneVal = 2000+(int(sinVal*1000));
-      tone(4, toneVal);
-      delay(2);
-    }
+  //ACTIVACIÓN DE ACTUADORES MEDIANTE CLASES
+  if(d >= 30){
+    activaSpeaker();
   }
-  else if(d <= 17){
-    noTone(4);
-    delay(2);
+  else if(d <= 29){
+    apagaSpeaker();
   }
 
-
-//Funciona todo
+  //ENVÍA DATOS SENSOR CAPACITIVO A "datos.php" mediante variable GET
   if(client.connect(server,80)>0){
     Serial.println("conexión establecida");
     client.print("GET /Invernadero/datos.php?varCap=");
@@ -119,7 +144,7 @@ void loop(void){
     client.println();
     Serial.println("Conectado"); 
   }
-
+  //ENVÍA DATOS SENSOR CAPACITIVO A "datos.php" mediante variable GET
   if(client.connect(server,80)>0){
     Serial.println("conexión establecida");
     client.print("GET /Invernadero/datos.php?sensorDS18B20=");
@@ -129,7 +154,7 @@ void loop(void){
     client.println();
     Serial.println("Conectado"); 
   }
-
+  //ENVÍA DATOS SENSOR CAPACITIVO A "datos.php" mediante variable GET
   if(client.connect(server,80)>0){
     Serial.println("conexión establecida");
     client.print("GET /Invernadero/datos.php?varLDR=");
@@ -139,7 +164,7 @@ void loop(void){
     client.println();
     Serial.println("Conectado"); 
   }
-  
+  //ENVÍA DATOS SENSOR CAPACITIVO A "datos.php" mediante variable GET
   if(client.connect(server,80)>0){
     Serial.println("conexión establecida");
     client.print("GET /Invernadero/datos.php?d=");
@@ -149,7 +174,6 @@ void loop(void){
     client.println();
     Serial.println("Conectado"); 
   }
-  
   else{
     Serial.println("Error en la conexion");
   }
@@ -158,4 +182,35 @@ void loop(void){
   client.flush();
   delay(1000);
 }
-   
+
+//CLASES ACTIVACIÓN ACTUADORES
+void activaVentilador(){
+  digitalWrite(rele1, HIGH);
+}
+
+void apagaVentilador(){
+  digitalWrite(rele1, LOW);
+}
+
+void activaBomba(){
+  digitalWrite(rele2, HIGH);
+}
+
+void apagaBomba(){
+  digitalWrite(rele2, LOW);
+}
+
+void activaSpeaker(){
+  //Cálculo Hz
+  for(int x=0; x<180; x++){
+    sinVal = (sin(x*(3.1412/180)));
+    toneVal = 2000+(int(sinVal*1000));
+    tone(4, toneVal);
+    delay(2);
+  }
+}
+
+void apagaSpeaker(){
+  noTone(4);
+  delay(2);
+}
