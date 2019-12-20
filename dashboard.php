@@ -4,120 +4,160 @@ $clave = "";
 $servidor = "localhost";
 $basededatos = "huerto";
 //creacion de la conexio0n de la base de datos con mysql_connect
-$conexion=mysqli_connect($servidor, $usuario, $clave) or die ("no se ha pdido conectar al servidor");
+$conexion = mysqli_connect($servidor, $usuario, $clave) or die ("no se ha pdido conectar al servidor");
 //selecion de la ase de datos a utilizar
 $db = mysqli_select_db($conexion, $basededatos) or die ("no se ha podido conectar a la base de datos");
 //seleccion del a base de datos
-$consulta = "SELECT * FROM sensor_suelo JOIN sensor_luminosidad JOIN sensor_distancia 
-JOIN sensor_dht11 LIMIT 11 ";
+$consulta1 = "SELECT * FROM sensor_distancia   order by id desc LIMIT 2  ";
+$consulta2 = "SELECT * FROM  sensor_luminosidad ORDER BY id desc  LIMIT 2 " ; 
+$consulta3 = "SELECT * FROM sensor_suelo order by id desc LIMIT 13  ";
+$consulta4 = "SELECT * FROM sensor_temperatura order by id desc LIMIT 2 ";
+
 //resultado con la respuesta a la consulta
-$resultado =mysqli_query($conexion, $consulta) or die ("error al consultar");
-$sensores = array();
-$sensor = array();
+$resultado1 = mysqli_query($conexion, $consulta1) or die ("error al consultar");
+$resultado2 = mysqli_query($conexion, $consulta2) or die ("error al consultar");
+$resultado3 = mysqli_query($conexion, $consulta3) or die ("error al consultar");
+$resultado4 = mysqli_query($conexion, $consulta4) or die ("error al consultar");
+$sensor_distancia = array();
+$sensor_luminosidad = array();
+$sensor_suelo = array();
+$sensor_temperatura = array();
+$sensores1 = array();
+$sensores2 = array();
+$sensores3 = array();
+$sensores4 = array();
+//while sensor distancia
+while($columna = mysqli_fetch_array($resultado1)){
+  $sensor_distancia["id"] = $columna['id'];
+  $sensor_distancia["valor_distancia_agua"] = $columna['valor_distancia_agua'];
+  $sensor_distancia["fecha_medicion"] = $columna['fecha_medicion'];
+  $sensor_distancia["hora_medicion"] = $columna['hora_medicion'];
 
 
-
-while($columna = mysqli_fetch_array($resultado)){
-  $sensor["id_sensor_suelo"] = $columna ['id_sensor_suelo'];
-  $sensor["valor_humedad_suelo"] = $columna ['valor_humedad_suelo'];
-  $sensor["fecha_medicion"] = $columna ['fecha_medicion'];
-  $sensor["hora_medicion"] = $columna ['hora_medicion'];
-  $sensor["id_sensor_luminosidad"] = $columna ['id_sensor_luminosidad'];
-  $sensor["valor_luminosidad"] = $columna ['valor_luminosidad'];
-  $sensor["fecha_medicion"] = $columna ['fecha_medicion'];
-  $sensor["hora_medicion"] = $columna ['hora_medicion'];
-  $sensor["id_sensor_distancia"] = $columna ['id_sensor_distancia'];
-  $sensor["valor_profundidad"] = $columna ['valor_profundidad'];
-  $sensor["fecha_medicion"] = $columna ['fecha_medicion'];
-  $sensor["hora_medicion"] = $columna ['hora_medicion'];
-  $sensor["id_sensor_dht11"] = $columna ['id_sensor_dht11'];
-  $sensor["dht11_humedad"] = $columna ['dht11_humedad'];
-  $sensor["dht11_temperatura"] = $columna ['dht11_temperatura'];
-  $sensor["fecha_medicion"] = $columna ['fecha_medicion'];
-  $sensor["hora_medicion"] = $columna ['hora_medicion'];
-  array_push($sensores, $sensor);
+  array_push($sensores1, $sensor_distancia);
 }
 
-while($columna=mysqli_fetch_array($resultado)){                                          
+//while sensor luminosidad
+while($columna = mysqli_fetch_array($resultado2)){                                              
+  $sensor_luminosidad["id"] = $columna['id'];
+  $sensor_luminosidad["valor_luminosidad_ambiente"] = $columna['valor_luminosidad_ambiente'];
+  $sensor_luminosidad["fecha_medicion"] = $columna['fecha_medicion'];
+  $sensor_luminosidad["hora_medicion"] = $columna['hora_medicion'];
 
-}       
+  array_push($sensores2, $sensor_luminosidad);
+}
+//while sensor suelo 
+while($columna = mysqli_fetch_array($resultado3)){
+  $sensor_suelo["id"] = $columna ['id'];
+  $sensor_suelo["valor_humedad_suelo"] = $columna['valor_humedad_suelo'];
+  $sensor_suelo["fecha_medicion"] = $columna['fecha_medicion'];
+  $sensor_suelo["hora_medicion"] = $columna ['hora_medicion'];
+ 
+  array_push($sensores3, $sensor_suelo);
+}
+ //while sensor temperatura
+ while($columna = mysqli_fetch_array($resultado4)){                                          
+  $sensor_temperatura["id"] = $columna['id'];
+  $sensor_temperatura["valor_temperatura_ambiente"] = $columna['valor_temperatura_ambiente'];
+  $sensor_temperatura["fecha_medicion"] = $columna['fecha_medicion'];
+  $sensor_temperatura["hora_medicion"] = $columna['hora_medicion'];
+  array_push($sensores4, $sensor_temperatura);
+}
+
+
+
+      
+ 
  ?> 
 <!DOCTYPE html>
-<html lang="es" dir="ltr">
+<html lang = "es" dir = "ltr">
   <head>
-    <meta charset="utf-8">
+  <meta http-equiv="Refresh" content="10;url=http://localhost/Invernadero/dashboard.php">
+    <meta charset = "utf-8">
     <link rel="stylesheet" href="css/bootstrap.css">
     <title></title>
   </head>
-  <div class="container">
-  <div class="row">
-    <div class="col-md-6">
+  <div class = "container">
+  <div class = "row">
+    <div class = "col-md-6">
           <h3>Humedad en suelo</h3>
           <h6>Valores identificados en base a %</h6>
     </div>
-    <div class="col-md-6">
-        <h4>Humedad y Temperatura Ambiente</h4>
+    <div class = "col-md-6">
+        <h4>Temperatura Ambiente</h4>
         <h6>Valores medidos en % y en ºC</h6>
   </div>
   </div>
   </div>
   <body>
-    <div class="container">
-    <div class="row">
-        <div class="col-md-6">
-          <table class="table table-hover table-bordered shadow p-3 mb-5 bg-white rounded" >
+    <div class = "container">
+    <div class = "row">
+        <div class = "col-md-6">
+          <table class = "table table-hover table-bordered shadow p-3 mb-5 bg-white rounded" >
             <tr>
               <td>cantidad</td>
               <td>id </td>
               <td>% Humedad </td>              
               <td>Fecha</td>
               <td>Hora </td>
+              <a href="intentotabla1.php">Tabla completa</a> &nbsp &nbsp &nbsp <a href="alerta1.php">alertas</a> 
+              &nbsp &nbsp &nbsp <a href="alarma1.php">Alarmas</a> 
+             
             </tr>
             <?php
-            for ($i=0; $i < count($sensores); $i++) {
-             
+            for ($i = 0; $i < count($sensores3); $i++) {             
               ?>
-              <tr>
-              <td><?php echo $i; ?></td>
-                <td><?php echo $sensores[$i]["id_sensor_suelo"]; ?> </td>
-                <td><?php echo $sensores[$i]["valor_humedad_suelo"];?> </td>
-                <td><?php echo $sensores[$i]["fecha_medicion"]; ?> </td>
-                <td><?php echo $sensores[$i]["hora_medicion"];?> </td>
-              </tr>
-              <?php
               
+              <tr>
+              
+                <td>
+                <?php
+                $cantidad1 = $i;
+                $cantidad1 = $cantidad1 + 1;   
+                echo $cantidad1; 
+                ?>
+                </td>
+                <td><?php echo $sensores3[$i]["id"]; ?> </td>
+                <td><?php echo $sensores3[$i]["valor_humedad_suelo"];?> </td>
+                <td><?php echo $sensores3[$i]["fecha_medicion"]; ?> </td>
+                <td><?php echo $sensores3[$i]["hora_medicion"];?> </td>               
+              </tr>
+              <?php           
             }
             ?>
+            
           </table>
         </div>
         <!-- COSTADO DERECHO ARRIBA-->
-        <div class="col-md-4">
+        <div class="col-md-5">
           <table class="table table-hover table-bordered shadow p-3 mb-5 bg-white rounded">
             <tr>
               <td>cantidad</td>
-              <td>id </td>              
-              <td>% Humedad </td>
+              <td>id </td>                           
               <td>T. ºC</td>
               <td>Fecha</td>
               <td>Hora </td>
+              <a href="intentotabla4.php ">Tabla completa</a> &nbsp &nbsp &nbsp <a href="alerta4.php">alertas</a> 
+              &nbsp &nbsp &nbsp <a href="alarma4.php">Alarmas</a> 
             </tr>
             <?php
-            for ($i=0; $i < count($sensores); $i++) {               
-              if ($sensores[$i]["id_sensor_dht11"] > 0) {
+            for ($i = 0; $i < count($sensores4); $i++) {               
+             
               ?>
               <tr>
-                <td><?php echo $i; ?></td>                
-                <td><?php echo $sensores[$i]["id_sensor_dht11"]; ?> </td>
-                <td><?php echo $sensores[$i]["dht11_humedad"];?> </td>
-                <td><?php echo $sensores[$i]["dht11_temperatura"];?> </td>
-                <td><?php echo $sensores[$i]["fecha_medicion"]; ?> </td>
-                <td><?php echo $sensores[$i]["hora_medicion"];?> </td>
+                <td><?php echo $i+1; ?></td>                
+                <td><?php echo $sensores4[$i]["id"]; ?> </td>
+                <td><?php echo $sensores4[$i]["valor_temperatura_ambiente"];?> </td>
+                <td><?php echo $sensores4[$i]["fecha_medicion"]; ?> </td>
+                <td><?php echo $sensores4[$i]["hora_medicion"];?> </td>
               </tr>
               <?php              
-            }
+            
           }
             ?>
+            
           </table>
+          
           <!-- FIN COSTADO DERECHO.-->
           <h4>Luminosidad</h4>
           <h6>Valor medido en lux</h6>
@@ -125,25 +165,29 @@ while($columna=mysqli_fetch_array($resultado)){
             <tr>
               <td>cantidad</td>
               <td>id </td>
+              <td>Lux</td>
               <td>Fecha </td>
               <td>Hora </td>
-              <td>Lux</td>
+              <a href="intentotabla3.php">Tabla completa</a> &nbsp &nbsp &nbsp <a href="alerta3.php">alertas</a> 
+              &nbsp &nbsp &nbsp <a href="alarma3.php">Alarmas</a> 
+              
             </tr>
             <?php
-            for ($i=0; $i < count($sensores); $i++) {
-               if ($sensores[$i]["id_sensor_luminosidad"] > 0) {
+            for ($i = 0; $i < count($sensores2); $i++) {
+             
               ?>
               <tr>
-                <td><?php echo $i; ?></td>
-                <td><?php echo $sensores[$i]["id_sensor_luminosidad"]; ?> </td>
-                <td><?php echo $sensores[$i]["valor_luminosidad"];?> </td>
-                <td><?php echo $sensores[$i]["fecha_medicion"]; ?> </td>
-                <td><?php echo $sensores[$i]["hora_medicion"];?> </td>
+                <td><?php echo $i+1; ?></td>
+                <td><?php echo $sensores2[$i]["id"]; ?> </td>
+                <td><?php echo $sensores2[$i]["valor_luminosidad_ambiente"];?> </td>
+                <td><?php echo $sensores2[$i]["fecha_medicion"]; ?> </td>
+                <td><?php echo $sensores2[$i]["hora_medicion"];?> </td>
               </tr>
               <?php
-              }
+              
             }
             ?>
+            
           </table>
           <h4>Valor de llenado estanque</h4>
           <h6>Valor medido en Cms.</h6>
@@ -151,23 +195,25 @@ while($columna=mysqli_fetch_array($resultado)){
             <tr>
               <td>cantidad</td>
               <td>id</td>
-              <td>Fecha </td>
-              <td>Hora </td>
               <td>Distancia (Cms)</td>
+              <td>Hora </td>
+              <td>Fecha </td>
+              <a href="intentotabla2.php">Tabla completa</a> &nbsp &nbsp &nbsp <a href="alerta2.php">alertas</a> 
+              &nbsp &nbsp &nbsp <a href="alarma2.php">Alarmas</a>
             </tr>
             <?php
-            for ($i=0; $i < count($sensores); $i++) {
-               if ($sensores[$i]["id_sensor_suelo"] > 0 ) {
+            for ($i = 0; $i < count($sensores1); $i++) {
+               
               ?>
               <tr>
-                <td><?php echo $i; ?></td>
-                <td><?php echo $sensores[$i]["id_sensor_suelo"]; ?> </td>
-                <td><?php echo $sensores[$i]["valor_humedad_suelo"];?> </td>
-                <td><?php echo $sensores[$i]["fecha_medicion"]; ?> </td>
-                <td><?php echo $sensores[$i]["hora_medicion"];?> </td>
+                <td><?php echo $i+1; ?></td>
+                <td><?php echo $sensores1[$i]["id"]; ?> </td>
+                <td><?php echo $sensores1[$i]["valor_distancia_agua"];?> </td>
+                <td><?php echo $sensores1[$i]["fecha_medicion"]; ?> </td>
+                <td><?php echo $sensores1[$i]["hora_medicion"];?> </td>
               </tr>
               <?php
-              }
+              
             }
             ?>
           </table>
